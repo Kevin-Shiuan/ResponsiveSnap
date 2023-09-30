@@ -1,0 +1,9 @@
+{
+  "name": "ResponsiveSnap",
+  "id": "1205868823812750536",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "editorType": ["figma", "figjam"],
+  "permissions": ["currentuser"],
+  "ui": "ui.html"
+}

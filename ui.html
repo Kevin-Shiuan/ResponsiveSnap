@@ -1,0 +1,699 @@
+<script type="module">
+  import { createElement as h, render, Component, Fragment } from 'https://unpkg.com/preact@latest?module';
+  import { useState, useEffect } from 'https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module';
+  import htm from 'https://esm.sh/htm';
+
+  window.addEventListener(
+    'load',
+    function (e) {
+      if (navigator.onLine) {
+        console.log('user is online!');
+        parent.postMessage({ pluginMessage: 'online' }, '*');
+      } else {
+        console.log('user is offline...');
+        parent.postMessage({ pluginMessage: 'offline' }, '*');
+      }
+    },
+    false
+  );
+
+  window.addEventListener(
+    'online',
+    function (e) {
+      console.log('user back online :)');
+      parent.postMessage({ pluginMessage: 'online' }, '*');
+    },
+    false
+  );
+
+  window.addEventListener(
+    'offline',
+    function (e) {
+      console.log('user is offline...');
+      parent.postMessage({ pluginMessage: 'offline' }, '*');
+    },
+    false
+  );
+
+  // Initialize htm with Preact
+  const html = htm.bind(h);
+
+  function App() {
+    const [device, setDevice] = useState([
+      {
+        width: 0,
+        height: 0,
+        emulateDevice: '',
+        customSize: false,
+        fullpage: false,
+      },
+    ]);
+    // const [URLvalue, setURLvalue] = useState('');
+
+    const preserveValue = () => {
+      let newDevices = [];
+      for (let i = 0; i < device.length; i++) {
+        const width = document.getElementById(`width${i}`).value;
+        const height = document.getElementById(`height${i}`).value;
+        const emulateDevice = document.getElementById(`device${i}`).value;
+        const customSize = document.getElementById(`custom-size${i}`).checked;
+        // const fullpage = document.getElementById(`fullpage${i}`).checked;
+        const fullpage = false;
+        newDevices.push({ width, height, emulateDevice, customSize, fullpage });
+      }
+      return newDevices;
+    };
+
+    const updateValue = (newDevices) => {
+      for (let i = 0; i < newDevices.length; i++) {
+        document.getElementById(`width${i}`).value = newDevices[i].width;
+        document.getElementById(`height${i}`).value = newDevices[i].height;
+        document.getElementById(`device${i}`).value = newDevices[i].emulateDevice;
+        document.getElementById(`custom-size${i}`).checked = newDevices[i].customSize;
+        const deviceSelect = document.getElementById(`device-select-container${i}`),
+          customSize = document.getElementById(`custom-size-container${i}`);
+        if (newDevices[i].customSize) {
+          deviceSelect.style.display = 'none';
+          customSize.style.display = 'flex';
+        } else {
+          deviceSelect.style.display = 'block';
+          customSize.style.display = 'none';
+        }
+        // document.getElementsByName(`fullpage${i}`).checked = device[i].fullpage;
+      }
+    };
+
+    const isValidUrl = (urlString) => {
+      try {
+        return Boolean(new URL(urlString));
+      } catch (e) {
+        return false;
+      }
+    };
+    const onSubmit = (e) => {
+      e.preventDefault();
+      if (!isValidUrl(e.target.URL.value)) {
+        parent.postMessage({ pluginMessage: 'invalidURL' }, '*');
+        return;
+      }
+      const URLvalue = e.target.URL.value;
+      const devices = preserveValue();
+      // console.log(URLvalue);
+      // console.log(devices);
+      const notEmptyDevices = devices.filter((item) => {
+        return item.emulateDevice !== '' || (item.height >= 360 && item.width >= 360);
+      });
+      const validDevices = notEmptyDevices.map((item) => {
+        if (item.customSize) {
+          return { width: item.width, height: item.height, emulateDevice: '', fullpage: false };
+        } else {
+          return { width: 0, height: 0, emulateDevice: item.emulateDevice, fullpage: false };
+        }
+      });
+      const args = { URL: URLvalue, devices: validDevices };
+      setDevice(devices);
+      // console.log(args);
+      parent.postMessage({ pluginMessage: JSON.stringify(args) }, '*');
+    };
+
+    const addDevice = () => {
+      if (device.length >= 3) {
+        parent.postMessage({ pluginMessage: 'maximum' }, '*');
+        return;
+      }
+      setDevice([...device, { width: 0, height: 0, emulateDevice: '', customSize: false, fullpage: false }]);
+    };
+
+    const removeDevice = (index) => {
+      if (device.length <= 1) {
+        parent.postMessage({ pluginMessage: 'minimum' }, '*');
+        return;
+      }
+      const newDevices = preserveValue();
+      newDevices.splice(index, 1);
+      setDevice(newDevices);
+      updateValue(newDevices);
+    };
+
+    const knowDevices = [
+      '', // default
+      'iPad (gen 7)',
+      'iPad (gen 7) landscape',
+      'iPad Mini',
+      'iPad Mini landscape',
+      'iPad Pro 11',
+      'iPad Pro 11 landscape',
+      'iPhone SE',
+      'iPhone SE landscape',
+      'iPhone 12',
+      'iPhone 12 landscape',
+      'iPhone 12 Pro',
+      'iPhone 12 Pro landscape',
+      'iPhone 12 Pro Max',
+      'iPhone 12 Pro Max landscape',
+      'iPhone 12 Mini',
+      'iPhone 12 Mini landscape',
+      'iPhone 13',
+      'iPhone 13 landscape',
+      'iPhone 13 Pro',
+      'iPhone 13 Pro landscape',
+      'iPhone 13 Pro Max',
+      'iPhone 13 Pro Max landscape',
+      'iPhone 13 Mini',
+      'iPhone 13 Mini landscape',
+      'Pixel 5',
+      'Pixel 5 landscape',
+    ];
+
+    return html` <Fragment>
+      <form onSubmit=${onSubmit}>
+        <h2>Screenshot Responsive Webpage</h2>
+        <p class="caption">Take screenshots of a webpage as viewed on different devices</p>
+
+        <div class="input-container container">
+          <h3 for="url" class="input-label">Website url</h3>
+          <input type="text" id="url" name="URL" class="input-field" required placeholder="url" />
+        </div>
+
+        <div class="container">
+          <div class="devices-toolbar">
+            <h3>Devices</h3>
+            <button type="button" class="add-device-button" onClick=${() => addDevice()}>add device</button>
+          </div>
+          <div class="devices-container">
+            ${device.map((item, index) => {
+              return html` <div class="device" key=${index}>
+                <div class="device-toolbar">
+                  <h4>Device ${index + 1}</h4>
+                  <button type="button" class="remove-device-button" onClick=${() => removeDevice(index)}>
+                    remove device
+                  </button>
+                </div>
+
+                <div class="device-setting-container">
+                  <div class="detail-setting-container">
+                    <div class="device-select-container" id="device-select-container${index}">
+                      <div class="input-container">
+                        <label for="device">Select device</label>
+                        <select name="device${index}" class="input-field input-for-device" id="device${index}">
+                          ${knowDevices.map((item) => {
+                            return html`<option value=${item}>${item}</option>`;
+                          })}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="custom-size-container" id="custom-size-container${index}">
+                      <div class="input-container input-for-device-dim">
+                        <label for="width${index}">Width</label>
+                        <input
+                          class="input-field input-for-device"
+                          type="number"
+                          name="width${index}"
+                          id="width${index}"
+                          min="360"
+                          max="4000"
+                        />
+                      </div>
+                      <div class="input-container input-for-device-dim">
+                        <label for="height${index}">Height</label>
+                        <input
+                          class="input-field input-for-device"
+                          type="number"
+                          name="height${index}"
+                          id="height${index}"
+                          min="360"
+                          max="4000"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-size-setting-container">
+                    <div class="custom-size-setting">
+                      <input
+                        type="checkbox"
+                        class="custom-size-checkbox"
+                        name="custom-size${index}"
+                        id="custom-size${index}"
+                        onclick=${(e) => {
+                          const deviceSelect = document.getElementById(`device-select-container${index}`),
+                            customSize = document.getElementById(`custom-size-container${index}`);
+                          if (e.target.checked) {
+                            deviceSelect.style.display = 'none';
+                            customSize.style.display = 'flex';
+                          } else {
+                            deviceSelect.style.display = 'block';
+                            customSize.style.display = 'none';
+                          }
+                        }}
+                      />
+                      <label for="custom-size">Custom Size</label>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+            })}
+          </div>
+        </div>
+
+        <div class="submit">
+          <button type="submit" class="submit-button">TAKE SCREENSHOTS</button>
+        </div>
+      </form>
+    </Fragment>`;
+  }
+
+  render(html`<${App} />`, document.body);
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cabin&display=swap');
+  body {
+    font-family: 'Cabin', sans-serif;
+    font-size: small;
+    background-color: var(--figma-color-bg);
+    color: var(--figma-color-text);
+  }
+  button[type='button'] {
+    font-family: 'Cabin', sans-serif;
+  }
+  .add-device-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    border: none;
+    transition: background-color 0.05s ease-in-out;
+  }
+  .add-device-button:hover {
+    background-color: #0069d9;
+    cursor: pointer;
+  }
+  form {
+    padding: 0 12px;
+  }
+  .container {
+    margin: 20px 0;
+  }
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* margin-top: 16px; */
+  }
+  .input-for-device-dim {
+    min-width: 80%;
+  }
+  .input-label {
+    margin-bottom: 4px;
+    color: #333;
+  }
+  .input-field {
+    width: 100%;
+    margin-top: 0.4rem;
+    outline: none;
+    padding: 8px 12px;
+    font-weight: 400;
+    border: none;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+    color: #333;
+  }
+  .input-field::placeholder {
+    color: #999;
+  }
+  .input-field:focus {
+    outline: none;
+    box-shadow: 0 0 4px #aaa;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .devices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .device {
+    padding: 12px;
+    /* /* background-color: #999; */
+    border-radius: 12px;
+    background-color: var(--figma-color-bg-secondary);
+  }
+  .devices-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  h4 {
+    margin-top: 0px;
+  }
+  .device-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .remove-device-button {
+    display: inline-block;
+    /* width: 32px; */
+    height: 24px;
+    background-color: transparent;
+    color: #f24822;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.05s ease-in-out;
+  }
+  .remove-device-button:hover {
+    background-color: #f3c1b7;
+    color: #dc3412;
+  }
+  .input-for-device {
+    background-color: #fff;
+  }
+  .device-setting-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .device-select-container {
+    width: 100%;
+    /* margin: 8px 0; */
+  }
+  .custom-size-setting-container {
+    min-width: 112px;
+    /* margin-right: 10px; */
+    margin-top: 20px;
+  }
+  .custom-size-container {
+    width: 100%;
+    display: none;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .custom-size-setting {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+  }
+  .custom-size-checkbox {
+    width: 20px;
+    height: 20px;
+    background-color: #f7f7f7;
+    border: none;
+    outline: none;
+  }
+  .custom-size-setting-container
+    .custom-size-setting
+    .custom-size-checkbox:checked
+    ~ .detail-setting-container
+    > .device-select-container {
+    display: none;
+  }
+
+  .custom-size-checkbox:not(:checked) ~ .detail-setting-container > .custom-size-container {
+    display: none;
+  }
+  div.submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .submit-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    border: none;
+    transition: background-color 0.05s ease-in-out;
+  }
+  .submit-button:hover {
+    background-color: #0069d9;
+    cursor: pointer;
+  }
+
+  /* 
+  .tgl {
+    display: none;
+  }
+  .tgl,
+  .tgl:after,
+  .tgl:before,
+  .tgl *,
+  .tgl *:after,
+  .tgl *:before,
+  .tgl-btn {
+    box-sizing: border-box;
+  }
+  .tgl::-moz-selection,
+  .tgl:after::-moz-selection,
+  .tgl:before::-moz-selection,
+  .tgl *::-moz-selection,
+  .tgl *:after::-moz-selection,
+  .tgl *:before::-moz-selection,
+  .tgl-btn::-moz-selection {
+    background: none;
+  }
+  .tgl::selection,
+  .tgl:after::selection,
+  .tgl:before::selection,
+  .tgl *::selection,
+  .tgl *:after::selection,
+  .tgl *:before::selection,
+  .tgl-btn::selection {
+    background: none;
+  }
+
+  .tgl-btn {
+    outline: 0;
+    display: block;
+    width: 4em;
+    height: 2em;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .tgl-btn:after,
+  .tgl-btn:before {
+    position: relative;
+    display: block;
+    content: '';
+    width: 50%;
+    height: 100%;
+  }
+  .tgl-btn:after {
+    left: 0;
+  }
+  .tgl-btn:before {
+    display: none;
+  }
+  .tgl:checked + .tgl-btn:after {
+    left: 50%;
+  }
+
+  .tgl-flat + .tgl-btn {
+    padding: 2px;
+    transition: all 0.2s ease;
+    background: #fff;
+    border: 4px solid #f2f2f2;
+    border-radius: 2em;
+  }
+  .tgl-flat + .tgl-btn:after {
+    transition: all 0.2s ease;
+    background: #f2f2f2;
+    content: '';
+    border-radius: 1em;
+  }
+  .tgl-flat:checked + .tgl-btn {
+    border: 4px solid #7fc6a6;
+  }
+  .tgl-flat:checked + .tgl-btn:after {
+    left: 50%;
+    background: #7fc6a6;
+  } */
+</style>
+
+<!-- 
+<style>
+  body {
+    font-family: sans-serif;
+    font-size: small;
+    background-color: var(--figma-color-bg);
+    color: var(--figma-color-text);
+  }
+  h4 {
+    margin: 0.2rem;
+    padding: 0 0.2rem;
+    width: 100%;
+    color: var(--figma-color-text-secondary);
+  }
+  input,
+  select {
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.5rem;
+    outline: none;
+    border: 1px solid var(--figma-color-border);
+    border-radius: 0.5rem;
+  }
+  select {
+    margin-right: 0.2rem;
+    padding: 0.5rem;
+  }
+  input:focus {
+    color: var(--figma-color-text);
+    background-color: var(--figma-color-bg-selected);
+    border: 1px solid var(--figma-color-border-selected);
+  }
+  input[type='number'] {
+    width: 6rem;
+  }
+  button {
+    background-color: var(--figma-color-bg-brand);
+    color: var(--figma-color-text-onbrand);
+    border-radius: 6px;
+    padding: 0.8rem;
+    /* font-size: 1rem; */
+    border: none;
+  }
+  button[type='button'] {
+    width: 100%;
+    padding: 0.2rem;
+    border-radius: 1rem;
+  }
+  button.add {
+    width: 6rem;
+  }
+  button[type='submit'] {
+    width: 100%;
+    padding: 0.4rem;
+  }
+  button[type='button'].remove {
+    width: 2rem;
+    background-color: var(--figma-color-bg-danger);
+    color: var(--figma-color-text-ondanger);
+    padding: 0.2rem;
+    border-radius: 1rem;
+  }
+  button[type='button'].remove:disabled {
+    background-color: var(--figma-color-bg-disabled);
+    color: var(--figma-color-text-ondisabled);
+  }
+  label {
+    color: var(--figma-color-text-secondary);
+  }
+  div.box {
+    margin: 1.2rem 0 0.6 0;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: var(--figma-color-bg-secondary);
+    border: 1px solid --figma-color-border;
+  }
+  div.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 0.2rem;
+  }
+  div.add {
+    margin: 0.2rem 0 0.6rem 0;
+    padding: 0.2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  button:hover {
+    background-color: var(--figma-color-bg-brand-hover);
+    color: var(--figma-color-text-onbrand);
+  }
+  hr {
+    color: var(--figma-color-border-component);
+    margin: 1rem;
+  }
+</style> -->
+
+<!-- <div class="customization">
+            <h4>Customization</h4>
+            <div class="row">
+              <label for="fullpage">Fullpage</label>
+              <input type="checkbox" name="fullpage" id="fullpage" />
+            </div>
+          </div> -->
+<!--           
+          <div class="device">
+            <div class="device-toolbar">
+              <h4>Device ${0}</h4>
+              <button type="button" class="remove-device-button" onClick=${() => removeDevice(0)}>
+                remove device
+              </button>
+            </div>
+
+            <div class="device-setting-container">
+              <div class="detail-setting-container">
+
+                <div class="device-select-container" id="device-select-container${0}">
+                  <div class="input-container">
+                    <label for="device">Select device</label>
+                    <select name="device${0}" class="input-field input-for-device" id="device${0}">
+                      ${knowDevices.map((item) => {
+                        return html`<option value=${item}>${item}</option>`;
+                      })}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="custom-size-container" id="custom-size-container${0}">
+                  <div class="input-container">
+                    <label for="width${0}">Width</label>
+                    <input class="input-field input-for-device" type="number" name="width${0}" id="width${0}" min="0" />
+                  </div>
+                  <div class="input-container">
+                    <label for="height${0}">Height</label>
+                    <input class="input-field input-for-device" type="number" name="height${0}" id="height${0}" min="0" />
+                  </div>
+                </div>
+
+              </div>
+              <div class="custom-size-setting-container">
+                <div class="custom-size-setting">
+                  <input type="checkbox" class="custom-size-checkbox" name="custom-size" onclick=${(e) => {
+                    let deviceSelect = document.getElementById(`device-select-container${0}`),
+                      customSize = document.getElementById(`custom-size-container${0}`);
+                    if (e.target.checked) {
+                      deviceSelect.style.display = 'none';
+                      customSize.style.display = 'flex';
+                    } else {
+                      deviceSelect.style.display = 'block';
+                      customSize.style.display = 'none';
+                    }
+                  }}/>
+                  <label for="custom-size">Custom Size</label>
+                </div>
+              </div>
+
+            </div>
+          </div> -->
