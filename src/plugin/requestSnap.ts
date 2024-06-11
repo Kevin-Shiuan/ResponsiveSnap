@@ -1,14 +1,14 @@
 interface Params {
-  URL: string;
-  settings: Settings;
-  userId: string | null;
+  URL: string
+  settings: Settings
+  userId: string | null
 }
 
 interface Settings {
-  width: number;
-  height: number;
-  emulateDevice: string;
-  fullpage: boolean;
+  width: number
+  height: number
+  emulateDevice: string
+  fullpage: boolean
 }
 
 export async function requestSnap({ params, fetchUrl }: { params: Params; fetchUrl: string }) {
@@ -18,15 +18,15 @@ export async function requestSnap({ params, fetchUrl }: { params: Params; fetchU
       body: JSON.stringify({
         URL: params.URL,
         settings: params.settings,
-        userId: params.userId,
+        userId: params.userId
       }),
       headers: {
-        'Content-type': 'application/json; charset=UTF-8',
+        'Content-type': 'application/json; charset=UTF-8'
       },
-      cache: 'no-store',
-    }).then((res) => res.json());
+      cache: 'no-store'
+    }).then((res) => res.json())
   } catch (err) {
-    console.log(err);
-    return err;
+    console.log(err)
+    return err
   }
 }

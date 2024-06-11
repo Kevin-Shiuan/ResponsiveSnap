@@ -1,61 +1,61 @@
-import { checkServer } from './utils/checkServer';
-import { respondProcess } from './respondProcess';
+import { respondProcess } from './respondProcess'
+import { checkServer } from './utils/checkServer'
 
-const fetchUrl = 'https://responsivesnap-backend.up.railway.app';
+const fetchUrl = 'https://responsivesnap-backend.up.railway.app'
 
 interface Settings {
-  width: number;
-  height: number;
-  emulateDevice: string;
-  fullpage: boolean;
+  width: number
+  height: number
+  emulateDevice: string
+  fullpage: boolean
 }
 // check the server status
-checkServer({ fetchUrl });
+checkServer({ fetchUrl })
 
-figma.showUI(__html__, { visible: true, themeColors: true, width: 400, height: 800 });
+figma.showUI(__html__, { visible: true, themeColors: true, width: 400, height: 800 })
 
 // TODO: refactor into switch case
 figma.ui.onmessage = async (message) => {
   if (message === 'offline') {
-    figma.notify('This plugin require internet connection', { error: true });
-    return;
+    figma.notify('This plugin require internet connection', { error: true })
+    return
   }
   if (message === 'online') {
-    return;
+    return
   }
   if (message === 'minimum') {
-    figma.notify('Please provide at least one device to take a snapshot');
-    return;
+    figma.notify('Please provide at least one device to take a snapshot')
+    return
   }
   if (message === 'maximum') {
-    figma.notify('Maximum 3 devices are allowed');
-    return;
+    figma.notify('Maximum 3 devices are allowed')
+    return
   }
   if (message === 'invalidURL') {
-    figma.notify('the URL is invalid', { error: true });
-    return;
+    figma.notify('the URL is invalid', { error: true })
+    return
   }
-  const respond = JSON.parse(message);
+  const respond = JSON.parse(message)
   // console.log(message);
   if (!respond.devices.length) {
-    figma.notify('Please fill in the device information');
-    return;
+    figma.notify('Please fill in the device information')
+    return
   }
   // await main({ URL: respond.URL, arrSettings: respond.devices });
-};
-
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function main({ URL, arrSettings }: { URL: string; arrSettings: Settings[] }) {
-  console.log('ResponsiveSnap plugin is running...');
+  console.log('ResponsiveSnap plugin is running...')
   const runningNotifier = figma.notify('Taking snapshots...', {
-    timeout: Infinity,
-  });
+    timeout: Infinity
+  })
   // Runs this code if the plugin is run in Figma
   // if (figma.editorType === 'figma') {
   // get the viewport center
-  const posX0 = figma.viewport.center.x;
-  const posY0 = figma.viewport.center.y;
+  const posX0 = figma.viewport.center.x
+  const posY0 = figma.viewport.center.y
   // set the user id
-  const userId = figma.currentUser ? figma.currentUser.id : '';
+  const userId = figma.currentUser ? figma.currentUser.id : ''
 
   // create an array of promises, each promise is a snapshot request and insert image process
   const tasks = arrSettings.map((settings) => {
@@ -63,70 +63,71 @@ async function main({ URL, arrSettings }: { URL: string; arrSettings: Settings[]
       params: { URL, settings: settings, userId },
       fetchUrl,
       posX: posX0,
-      posY: posY0,
-    });
-  });
+      posY: posY0
+    })
+  })
   // set total number of snapshots
-  const totalTasks = tasks.length;
-  let completedTasks = 0;
-  let uncompletedTasks = 0;
-  let insertedImgNodes: any[] = [];
-  let message = () => {
+  const totalTasks = tasks.length
+  let completedTasks = 0
+  let uncompletedTasks = 0
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let insertedImgNodes: any[] = []
+  const message = () => {
     return uncompletedTasks
       ? `Taking snapshots... ${completedTasks}/${totalTasks}, (${uncompletedTasks} failed)`
-      : `Taking snapshots... ${completedTasks}/${totalTasks}`;
-  };
+      : `Taking snapshots... ${completedTasks}/${totalTasks}`
+  }
 
   // resolve all promises
   // let insertedImgNodes: any[] = await Promise.allSettled(tasks);
-  runningNotifier.cancel();
+  runningNotifier.cancel()
   let progressBar = figma.notify(message(), {
-    timeout: Infinity,
-  });
+    timeout: Infinity
+  })
   tasks.forEach(async (task) => {
     task
       .then((result) => {
-        insertedImgNodes.push(result);
-        completedTasks++;
-        progressBar.cancel();
+        insertedImgNodes.push(result)
+        completedTasks++
+        progressBar.cancel()
         progressBar = figma.notify(message(), {
-          timeout: Infinity,
-        });
+          timeout: Infinity
+        })
       })
       .catch(() => {
-        uncompletedTasks++;
+        uncompletedTasks++
         // insertedImgNodes.push(result);
         // console.log('error in main');
         // console.log(result);
         // completedTasks++;
-        progressBar.cancel();
+        progressBar.cancel()
         progressBar = figma.notify(message(), {
-          timeout: Infinity,
-        });
-      });
-  });
+          timeout: Infinity
+        })
+      })
+  })
   try {
-    await Promise.allSettled(tasks);
+    await Promise.allSettled(tasks)
   } catch (err) {
-    console.log(err);
-    progressBar.cancel();
+    console.log(err)
+    progressBar.cancel()
   }
   // adjust nodes position
   insertedImgNodes = insertedImgNodes.map((node, index) => {
     if (index) {
-      const preNode = insertedImgNodes[index - 1];
-      node.x = preNode.x + preNode.width + 100;
+      const preNode = insertedImgNodes[index - 1]
+      node.x = preNode.x + preNode.width + 100
     }
-    return node;
-  });
-  figma.viewport.scrollAndZoomIntoView(insertedImgNodes);
-  console.log('all images are inserted');
-  progressBar.cancel();
+    return node
+  })
+  figma.viewport.scrollAndZoomIntoView(insertedImgNodes)
+  console.log('all images are inserted')
+  progressBar.cancel()
   const finalMessage = uncompletedTasks
     ? `${completedTasks}/${totalTasks} snaps ready, (${uncompletedTasks} failed)`
-    : 'Your snaps are ready, enjoy!';
-  figma.notify(finalMessage);
+    : 'Your snaps are ready, enjoy!'
+  figma.notify(finalMessage)
 
-  console.log('ResponsiveSnap plugin runned successfully.');
+  console.log('ResponsiveSnap plugin runned successfully.')
   // figma.closePlugin();
 }
