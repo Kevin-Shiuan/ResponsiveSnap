@@ -1,7 +1,7 @@
 import { checkServer } from './utils/checkServer';
 import { respondProcess } from './respondProcess';
 
-const fetchUrl = process.env.fetchUrl as string;
+const fetchUrl = 'https://responsivesnap-backend.up.railway.app';
 
 interface Settings {
   width: number;
@@ -12,7 +12,9 @@ interface Settings {
 // check the server status
 checkServer({ fetchUrl });
 
-figma.showUI(__html__, { visible: true, themeColors: true, width: 400, height: 700 });
+figma.showUI(__html__, { visible: true, themeColors: true, width: 400, height: 800 });
+
+// TODO: refactor into switch case
 figma.ui.onmessage = async (message) => {
   if (message === 'offline') {
     figma.notify('This plugin require internet connection', { error: true });
@@ -39,7 +41,7 @@ figma.ui.onmessage = async (message) => {
     figma.notify('Please fill in the device information');
     return;
   }
-  await main({ URL: respond.URL, arrSettings: respond.devices });
+  // await main({ URL: respond.URL, arrSettings: respond.devices });
 };
 
 async function main({ URL, arrSettings }: { URL: string; arrSettings: Settings[] }) {

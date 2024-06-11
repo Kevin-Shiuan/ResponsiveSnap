@@ -36,7 +36,7 @@ export async function respondProcess({
       try {
         const respond = await requestSnap({ params: params, fetchUrl });
         if (respond.errMsg) throw respond.errMsg;
-        return resolve(insertImage({ ...respond, posX: posX, posY: posY }));
+        return resolve(insertImage({ ...respond, posX, posY }));
       } catch (err) {
         console.log(`error in fetching from server, retrying ${retryCount + 1}/${numberOfRetries}`);
       }
