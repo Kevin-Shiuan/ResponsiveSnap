@@ -12,7 +12,7 @@ interface Settings {
 // check the server status
 checkServer({ fetchUrl })
 
-figma.showUI(__html__, { visible: true, themeColors: true, width: 400, height: 800 })
+figma.showUI(__html__, { visible: true, themeColors: true, width: 320, height: 640 })
 
 // TODO: refactor into switch case
 figma.ui.onmessage = async (message) => {
