@@ -1,50 +1,46 @@
+import { DeviceSettings } from '../types/index'
 import { respondProcess } from './respondProcess'
 import { checkServer } from './utils/checkServer'
 
 const fetchUrl = 'https://responsivesnap-backend.up.railway.app'
 
-interface Settings {
-  width: number
-  height: number
-  emulateDevice: string
-  fullpage: boolean
-}
-// check the server status
-checkServer({ fetchUrl })
+figma.showUI(__html__, { visible: true, themeColors: true, width: 320, height: 600 })
 
-figma.showUI(__html__, { visible: true, themeColors: true, width: 320, height: 640 })
-
-// TODO: refactor into switch case
 figma.ui.onmessage = async (message) => {
-  if (message === 'offline') {
-    figma.notify('This plugin require internet connection', { error: true })
-    return
-  }
-  if (message === 'online') {
-    return
-  }
-  if (message === 'minimum') {
-    figma.notify('Please provide at least one device to take a snapshot')
-    return
-  }
-  if (message === 'maximum') {
-    figma.notify('Maximum 3 devices are allowed')
-    return
-  }
-  if (message === 'invalidURL') {
-    figma.notify('the URL is invalid', { error: true })
-    return
-  }
   const respond = JSON.parse(message)
-  // console.log(message);
-  if (!respond.devices.length) {
-    figma.notify('Please fill in the device information')
-    return
+  switch (message) {
+    case 'offline':
+      figma.notify('This plugin requires an internet connection', { error: true })
+      return
+
+    case 'online':
+      await checkServer({ fetchUrl })
+      return
+
+    // case 'minimum':
+    //   figma.notify('Please provide at least one device to take a snapshot')
+    //   return
+
+    // case 'maximum':
+    //   figma.notify('Maximum 3 devices are allowed')
+    //   return
+
+    case 'invalidURL':
+      figma.notify('The URL is invalid', { error: true })
+      return
+
+    default:
+      if (!respond.devices.length) {
+        figma.notify('Please fill in the device information')
+        return
+      }
+      // await main({ URL: respond.URL, arrSettings: respond.devices });
+      break
   }
-  // await main({ URL: respond.URL, arrSettings: respond.devices });
 }
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function main({ URL, arrSettings }: { URL: string; arrSettings: Settings[] }) {
+async function main({ URL, arrSettings }: { URL: string; arrSettings: DeviceSettings[] }) {
   console.log('ResponsiveSnap plugin is running...')
   const runningNotifier = figma.notify('Taking snapshots...', {
     timeout: Infinity
