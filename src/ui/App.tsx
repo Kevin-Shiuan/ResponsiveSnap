@@ -6,7 +6,7 @@ import './App.css'
 import { Button } from './components/Button'
 import { Input } from './components/Input'
 import DeviceCard from './molecules/DeviceCard'
-import { deviceConfig } from './types'
+import { DeviceSettings } from './types'
 
 const DEFAULT_DEVICES_VALUE = {
   width: 1920,
@@ -35,15 +35,15 @@ const App = () => {
     })
   }
 
-  const getUpdateDeviceConfig = (index: number) => (deviceConfig: deviceConfig) => {
+  const updateDeviceSettingsAt = (index: number) => (newDeviceSettings: DeviceSettings) => {
     setDevices((prev) => {
       const newDevices = [...prev]
-      newDevices[index] = deviceConfig
+      newDevices[index] = newDeviceSettings
       return newDevices
     })
   }
 
-  const getRemoveDevice = (index: number) => () => {
+  const removeDeviceAt = (index: number) => () => {
     setDevices((prev) => {
       if (prev.length === 1) {
         return prev
@@ -128,9 +128,9 @@ const App = () => {
             <DeviceCard
               key={index}
               index={index}
-              deviceConfig={device}
-              updateConfig={getUpdateDeviceConfig(index)}
-              removeDevice={getRemoveDevice(index)}
+              deviceSettings={device}
+              updateDeviceSettings={updateDeviceSettingsAt(index)}
+              removeDevice={removeDeviceAt(index)}
             />
           ))}
           {showAddButton && (

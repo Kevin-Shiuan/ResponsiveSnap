@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/Card'
 import { Input } from '@/components/Input'
-import { deviceConfig } from '@/types'
+import { DeviceSettings } from '@/types'
 import { Cross2Icon } from '@radix-ui/react-icons'
 
 import DeviceSelect from './DeviceSelect'
@@ -17,36 +17,36 @@ export const minmax = (value: number, min = Number.MIN_SAFE_INTEGER, max = Numbe
 
 interface DeviceCardProps {
   index: number
-  deviceConfig: deviceConfig
-  updateConfig: (deviceConfig: deviceConfig) => void
+  deviceSettings: DeviceSettings
+  updateDeviceSettings: (deviceSettings: DeviceSettings) => void
   removeDevice: () => void
 }
 
-const DeviceCard = ({ index, deviceConfig, updateConfig, removeDevice }: DeviceCardProps) => {
-  const { emulateDevice, width, height } = deviceConfig
+const DeviceCard = ({ index, deviceSettings, updateDeviceSettings, removeDevice }: DeviceCardProps) => {
+  const { emulateDevice, width, height } = deviceSettings
   const isCustomSize = emulateDevice === 'custom'
   const [dimension, setDimension] = useState<Record<string, string>>({ width: String(width), height: String(height) })
 
   const updateDevice = (newDevice: string) => {
-    updateConfig({ ...deviceConfig, emulateDevice: newDevice })
+    updateDeviceSettings({ ...deviceSettings, emulateDevice: newDevice })
   }
 
   const changeDimension =
-    (property: keyof Pick<deviceConfig, 'width' | 'height'>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (property: keyof Pick<DeviceSettings, 'width' | 'height'>) => (e: React.ChangeEvent<HTMLInputElement>) => {
       setDimension((prev) => ({ ...prev, [property]: e.currentTarget.value }))
     }
 
-  const getUpdateDimension = (property: keyof Pick<deviceConfig, 'width' | 'height'>) => () => {
+  const getUpdateDimension = (property: keyof Pick<DeviceSettings, 'width' | 'height'>) => () => {
     const newValue = parseInt(dimension[property], 10)
 
     if (isNaN(newValue)) {
-      setDimension((prev) => ({ ...prev, [property]: String(deviceConfig[property]) }))
+      setDimension((prev) => ({ ...prev, [property]: String(deviceSettings[property]) }))
       return
     }
 
     const clampedDimension = Math.min(MAX_DIMENSION, Math.max(MIN_DIMENSION, newValue))
     setDimension((prev) => ({ ...prev, [property]: String(clampedDimension) }))
-    updateConfig({ ...deviceConfig, [property]: clampedDimension })
+    updateDeviceSettings({ ...deviceSettings, [property]: clampedDimension })
   }
 
   return (

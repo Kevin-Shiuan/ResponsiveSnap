@@ -1,4 +1,4 @@
-export type deviceConfig = {
+export type DeviceSettings = {
   width: number
   height: number
   emulateDevice: string
