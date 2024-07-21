@@ -114,11 +114,10 @@ const App = () => {
 
   return (
     <div className="m-0 p-4 pt-6 w-full h-full min-h-dvh overflow-auto flex flex-col gap-y-[24px]">
-      <div className="flex flex-col gap-y-6 flex-1">
+      <div className="flex flex-col gap-y-6">
         <div className="space-y-3">
           <div className="space-y-0.5">
             <h2 className="text-xl font-semibold tracking-tight">Website URL</h2>
-            {/* <p className="text-muted-foreground text-sm">Enter the webpage URL</p> */}
           </div>
           <Input type="text" value={url} placeholder="URL" onChange={(e) => setUrl(e.target.value)} />
         </div>
@@ -134,18 +133,16 @@ const App = () => {
               removeDevice={getRemoveDevice(index)}
             />
           ))}
-          {/* <DeviceCard index={1} emulateDevice={'custom'} />
-          <DeviceCard index={1} emulateDevice={'custom'} />
-          <DeviceCard index={1} emulateDevice={'custom'} /> */}
           {showAddButton && (
-            <Button variant="secondary" className="w-full" onClick={addNewDevice}>
+            <Button variant="secondary" className="w-full space-x-2" onClick={addNewDevice}>
               <PlusIcon />
+              <span>Add Device</span>
             </Button>
           )}
         </div>
       </div>
       <Button type="submit" onClick={onSubmit}>
-        Take Snapshot
+        Take Screenshot{devices.length > 1 ? 's' : ''}
       </Button>
     </div>
   )
