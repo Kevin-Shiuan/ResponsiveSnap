@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 
 import { PlusIcon } from '@radix-ui/react-icons'
 
+import MESSAGE_TYPE from '../constant/messageType'
 import { DeviceSettings } from '../types'
 import './App.css'
 import { Button } from './components/Button'
 import { Input } from './components/Input'
 import DeviceCard from './molecules/DeviceCard'
+import { sendMessage } from './services/messageService'
 
 const DEFAULT_DEVICES_VALUE = {
   width: 1920,
@@ -23,6 +25,7 @@ const App = () => {
   const showAddButton = devices.length < MAXIMUM_DEVICES_COUNT
 
   const onSubmit = () => {
+    sendMessage(MESSAGE_TYPE.TAKE_SCREENSHOT, { url, devices })
     console.log('submit')
   }
 

@@ -1,9 +1,11 @@
-import { SHOW_NOTIFICATION } from '../../constant/messageType'
+import MESSAGE_TYPE from '../../constant/messageType'
 
-export function sendMessage(type: string, data?: unknown) {
+type MessageType = (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE]
+
+export function sendMessage(type: MessageType, data?: unknown) {
   parent.postMessage({ pluginMessage: { type, data } }, '*')
 }
 
 export function figmaNotify(message: string, options?: NotificationOptions) {
-  sendMessage(SHOW_NOTIFICATION, { message, options })
+  sendMessage(MESSAGE_TYPE.SHOW_NOTIFICATION, { message, options })
 }

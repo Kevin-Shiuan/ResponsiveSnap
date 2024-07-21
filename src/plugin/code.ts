@@ -1,4 +1,4 @@
-import { SHOW_NOTIFICATION } from '../constant/messageType'
+import MESSAGE_TYPE from '../constant/messageType'
 import { DeviceSettings } from '../types/index'
 import { respondProcess } from './respondProcess'
 
@@ -10,8 +10,11 @@ figma.showUI(__html__, { visible: true, themeColors: true, width: 320, height: 6
 
 figma.ui.onmessage = async (pluginMessage) => {
   switch (pluginMessage.type) {
-    case SHOW_NOTIFICATION:
+    case MESSAGE_TYPE.SHOW_NOTIFICATION:
       figma.notify(pluginMessage.data.message, pluginMessage.data.options)
+      break
+    case MESSAGE_TYPE.TAKE_SCREENSHOT:
+      console.log(pluginMessage.data)
       break
     // case 'offline':
     //   figma.notify('This plugin requires an internet connection', { error: true })
@@ -29,9 +32,9 @@ figma.ui.onmessage = async (pluginMessage) => {
     //   figma.notify('Maximum 3 devices are allowed')
     //   return
 
-    case 'invalidURL':
-      figma.notify('The URL is invalid', { error: true })
-      return
+    // case 'invalidURL':
+    //   figma.notify('The URL is invalid', { error: true })
+    //   return
 
     default:
       // if (!pluginMessage.devices.length) {
