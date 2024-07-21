@@ -1,21 +1,25 @@
+import { SHOW_NOTIFICATION } from '../constant/messageType'
 import { DeviceSettings } from '../types/index'
 import { respondProcess } from './respondProcess'
-import { checkServer } from './utils/checkServer'
+
+// import { checkServer } from './utils/checkServer'
 
 const fetchUrl = 'https://responsivesnap-backend.up.railway.app'
 
 figma.showUI(__html__, { visible: true, themeColors: true, width: 320, height: 600 })
 
-figma.ui.onmessage = async (message) => {
-  const respond = JSON.parse(message)
-  switch (message) {
-    case 'offline':
-      figma.notify('This plugin requires an internet connection', { error: true })
-      return
+figma.ui.onmessage = async (pluginMessage) => {
+  switch (pluginMessage.type) {
+    case SHOW_NOTIFICATION:
+      figma.notify(pluginMessage.data.message, pluginMessage.data.options)
+      break
+    // case 'offline':
+    //   figma.notify('This plugin requires an internet connection', { error: true })
+    //   return
 
-    case 'online':
-      await checkServer({ fetchUrl })
-      return
+    // case 'online':
+    //   await checkServer({ fetchUrl })
+    //   return
 
     // case 'minimum':
     //   figma.notify('Please provide at least one device to take a snapshot')
@@ -30,10 +34,10 @@ figma.ui.onmessage = async (message) => {
       return
 
     default:
-      if (!respond.devices.length) {
-        figma.notify('Please fill in the device information')
-        return
-      }
+      // if (!pluginMessage.devices.length) {
+      //   figma.notify('Please fill in the device information')
+      //   return
+      // }
       // await main({ URL: respond.URL, arrSettings: respond.devices });
       break
   }
