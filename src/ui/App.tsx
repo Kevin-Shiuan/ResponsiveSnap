@@ -112,6 +112,7 @@ const App = () => {
               key={index}
               index={index}
               deviceSettings={device}
+              removable={devices.length > 1}
               updateDeviceSettings={updateDeviceSettingsAt(index)}
               removeDevice={removeDeviceAt(index)}
             />

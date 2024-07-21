@@ -18,11 +18,12 @@ export const minmax = (value: number, min = Number.MIN_SAFE_INTEGER, max = Numbe
 interface DeviceCardProps {
   index: number
   deviceSettings: DeviceSettings
+  removable: boolean
   updateDeviceSettings: (deviceSettings: DeviceSettings) => void
   removeDevice: () => void
 }
 
-const DeviceCard = ({ index, deviceSettings, updateDeviceSettings, removeDevice }: DeviceCardProps) => {
+const DeviceCard = ({ index, deviceSettings, removable, updateDeviceSettings, removeDevice }: DeviceCardProps) => {
   const { emulateDevice, width, height } = deviceSettings
   const isCustomSize = emulateDevice === 'custom'
   const [dimension, setDimension] = useState<Record<string, string>>({ width: String(width), height: String(height) })
@@ -56,7 +57,7 @@ const DeviceCard = ({ index, deviceSettings, updateDeviceSettings, removeDevice 
         <Button
           variant="ghost"
           size="icon"
-          className="w-[28px] h-[28px] opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-all"
+          className={`w-[28px] h-[28px] opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-all ${removable ? 'visible' : 'invisible'}`}
           onClick={removeDevice}
         >
           <Cross2Icon className="w-[14px] h-[14px]" />
