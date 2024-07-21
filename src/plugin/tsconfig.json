@@ -6,6 +6,6 @@
     "noUnusedParameters": true,
     "typeRoots": ["../../node_modules/@figma"]
   }
-  // "include": ["./**/*"],
+  // "include": ["../types/index.d.ts"]
   // "exclude": ["../../node_modules", "../../node_modules/@types"]
 }

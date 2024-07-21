@@ -1,3 +1,4 @@
+import { DeviceSettings } from '../types/index'
 import { insertImage } from './insertImage'
 import { requestSnap } from './requestSnap'
 import { delayExecution } from './utils/delayExecution'
@@ -5,16 +6,10 @@ import { random } from './utils/random'
 
 interface Params {
   URL: string
-  settings: Settings
+  settings: DeviceSettings
   userId: string | null
 }
 
-interface Settings {
-  width: number
-  height: number
-  emulateDevice: string
-  fullpage: boolean
-}
 export async function respondProcess({
   params,
   fetchUrl,
