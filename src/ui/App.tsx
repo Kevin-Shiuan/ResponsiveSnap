@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 
 import { PlusIcon } from '@radix-ui/react-icons'
 
+import { DeviceSettings } from '../types'
 import './App.css'
 import { Button } from './components/Button'
 import { Input } from './components/Input'
 import DeviceCard from './molecules/DeviceCard'
-import { DeviceSettings } from './types'
 
 const DEFAULT_DEVICES_VALUE = {
   width: 1920,

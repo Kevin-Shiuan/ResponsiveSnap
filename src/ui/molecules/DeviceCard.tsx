@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/Card'
 import { Input } from '@/components/Input'
-import { DeviceSettings } from '@/types'
 import { Cross2Icon } from '@radix-ui/react-icons'
 
+import { DeviceSettings } from '../../types'
 import DeviceSelect from './DeviceSelect'
 
 const MAX_DIMENSION = 4000
