@@ -69,15 +69,13 @@ const DeviceCard = ({ index, deviceSettings, updateDeviceSettings, removeDevice 
             <Input
               type="number"
               placeholder="Width"
-              value={width}
+              value={dimension.width}
               onInput={changeDimension('width')}
               onBlur={getUpdateDimension('width')}
             />
             <Input
               type="number"
               placeholder="Height"
-              step="1"
-              min="0"
               value={dimension.height}
               onInput={changeDimension('height')}
               onBlur={getUpdateDimension('height')}
