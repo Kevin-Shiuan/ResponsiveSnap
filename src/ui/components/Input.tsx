@@ -3,7 +3,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  error: boolean
+  error?: boolean
 }
 
 const errorClassName = 'border-2 border-destructive focus-visible:ring-destructive'
