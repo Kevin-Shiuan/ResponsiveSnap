@@ -8,8 +8,8 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { DeviceSettings } from '../../types'
 import DeviceSelect from './DeviceSelect'
 
-const MAX_DIMENSION = 4000
-const MIN_DIMENSION = 100
+const MAX_DIMENSION = 4096
+const MIN_DIMENSION = 360
 
 export const minmax = (value: number, min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => {
   return Math.max(Math.min(value, max), min)
