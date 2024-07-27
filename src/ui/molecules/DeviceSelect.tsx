@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select'
 
-import { DEVICES } from '../../constant/devices'
+import { DEVICES } from '../../constants/devices'
 
 interface DeviceSelectProps {
   value?: string

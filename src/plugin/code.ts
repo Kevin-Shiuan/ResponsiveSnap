@@ -1,4 +1,4 @@
-import MESSAGE_TYPE from '../constant/messageType'
+import MESSAGE_TYPE from '../constants/messageType'
 import { DeviceSettings } from '../types/index'
 import { respondProcess } from './respondProcess'
 

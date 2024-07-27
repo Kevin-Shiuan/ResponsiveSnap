@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { PlusIcon } from '@radix-ui/react-icons'
 
-import MESSAGE_TYPE from '../constant/messageType'
+import MESSAGE_TYPE from '../constants/messageType'
 import { DeviceSettings } from '../types'
 import './App.css'
 import { Button } from './components/Button'

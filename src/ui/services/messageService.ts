@@ -1,4 +1,4 @@
-import MESSAGE_TYPE from '../../constant/messageType'
+import MESSAGE_TYPE from '../../constants/messageType'
 
 type MessageType = (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE]
 
