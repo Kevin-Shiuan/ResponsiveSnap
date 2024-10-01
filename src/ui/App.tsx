@@ -87,8 +87,8 @@ const App = () => {
   }, [])
 
   return (
-    <div className="m-0 p-4 pt-6 w-full h-full min-h-dvh overflow-auto flex flex-col gap-y-[24px]">
-      <div className="space-y-5">
+    <div className="relative m-0 w-full h-full min-h-dvh max-h-dvh overflow-hidden">
+      <div className="space-y-5 px-4 pt-6 pb-16 h-full overflow-auto">
         <div className="space-y-3">
           <h2 className="text-xl font-semibold tracking-tight">Website URL</h2>
           <div className="space-y-1">
@@ -125,7 +125,7 @@ const App = () => {
           )}
         </div>
       </div>
-      <Button type="submit" onClick={onSubmit} disabled={Boolean(error)}>
+      <Button type="submit" onClick={onSubmit} disabled={Boolean(error)} className="absolute inset-x-4 bottom-4">
         Take Screenshot{devices.length > 1 ? 's' : ''}
       </Button>
     </div>
