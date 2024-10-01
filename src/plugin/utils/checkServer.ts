@@ -1,5 +1,4 @@
 export async function checkServer({ fetchUrl }: { fetchUrl: string }) {
-  console.log('checking server status...')
   try {
     const response = await fetch(fetchUrl + '/server-status', {
       method: 'GET',
