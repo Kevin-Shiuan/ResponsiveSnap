@@ -4,3 +4,10 @@ export type DeviceSettings = {
   emulateDevice: string
   fullPage: boolean
 }
+
+export interface ScreenshotData {
+  name: string
+  width: number
+  height: number
+  data: string[]
+}
