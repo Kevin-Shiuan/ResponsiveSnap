@@ -79,6 +79,10 @@ export default async function takeScreenshots({ fetchUrl, url, devices }: takeSc
   })
 
   try {
+    figmaNotification.cancel()
+    figmaNotification = figma.notify(getNotificationMessage(), {
+      timeout: Infinity
+    })
     await Promise.allSettled(tasks)
   } catch (err) {
     console.log(err)

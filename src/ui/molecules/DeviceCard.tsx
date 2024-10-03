@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/Card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/Card'
+import { Checkbox } from '@/components/Checkbox'
 import { Input } from '@/components/Input'
 import { Cross2Icon } from '@radix-ui/react-icons'
 
@@ -50,6 +51,10 @@ const DeviceCard = ({ index, deviceSettings, removable, updateDeviceSettings, re
     updateDeviceSettings({ ...deviceSettings, [property]: clampedDimension })
   }
 
+  const updateFullPage = () => {
+    updateDeviceSettings({ ...deviceSettings, fullPage: !deviceSettings.fullPage })
+  }
+
   return (
     <Card className="group">
       <CardHeader className="pb-3 flex justify-between items-center">
@@ -84,24 +89,17 @@ const DeviceCard = ({ index, deviceSettings, removable, updateDeviceSettings, re
           </div>
         )}
       </CardContent>
-      {/* TODO: fullPage screenshot */}
-      {/* <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between">
         <div className="flex items-center space-x-2">
-          <Checkbox
-            id="fullPage"
-            // checked={false}
-            // onClick={() => {
-            //   console.log('clicked')
-            // }}
-          />
+          <Checkbox id={`fullPage${index}`} checked={deviceSettings.fullPage} onClick={updateFullPage} />
           <label
-            htmlFor="fullPage"
+            htmlFor={`fullPage${index}`}
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             Full Page
           </label>
         </div>
-      </CardFooter> */}
+      </CardFooter>
     </Card>
   )
 }
