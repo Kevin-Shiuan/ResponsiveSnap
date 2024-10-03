@@ -5,5 +5,7 @@
   "editorType": ["figma", "figjam"],
   "permissions": ["currentuser"],
   "main": "dist/code.js",
-  "ui": "dist/index.html"
+  "ui": "dist/index.html",
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["https://responsivesnap-backend.up.railway.app/"] }
 }
