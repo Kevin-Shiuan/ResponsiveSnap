@@ -1,0 +1,23 @@
+export const DEVICES = [
+  'custom',
+  'iPad (gen 7)',
+  'iPad (gen 7) landscape',
+  'iPad Mini',
+  'iPad Mini landscape',
+  'iPad Pro 11',
+  'iPad Pro 11 landscape',
+  'iPhone SE',
+  'iPhone SE landscape',
+  'iPhone 13 Mini',
+  'iPhone 13 Mini landscape',
+  'iPhone 15',
+  'iPhone 15 landscape',
+  'iPhone 15 Plus',
+  'iPhone 15 Plus landscape',
+  'iPhone 15 Pro',
+  'iPhone 15 Pro landscape',
+  'iPhone 15 Pro Max',
+  'iPhone 15 Pro Max landscape',
+  'Pixel 7',
+  'Pixel 7 landscape'
+]

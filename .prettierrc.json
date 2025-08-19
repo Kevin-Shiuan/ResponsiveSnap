@@ -1,0 +1,11 @@
+{
+  "printWidth": 120,
+  "trailingComma": "none",
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrder": ["^react", "^(?!react)\\w+$", "^aws-amplify", "<THIRD_PARTY_MODULES>", "^[./]"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+}

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": ["ES2020"],
+    "strict": true,
+    "noUnusedParameters": true,
+    "typeRoots": ["../../node_modules/@figma"]
+  }
+  // "include": ["../types/index.d.ts"]
+  // "exclude": ["../../node_modules", "../../node_modules/@types"]
+}

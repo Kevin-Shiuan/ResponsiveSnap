@@ -1,18 +1,28 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es6"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/ui/*"]
+    },
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": false,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@figma"
-    ],
-    "outDir": "./dist",
-    "jsx": "react",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "skipLibCheck": true
-
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "typeRoots": ["../../node_modules/@types"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["./**/*"],
+  "exclude": ["../../node_modules", "../../node_modules/@types"]
 }
