@@ -34,7 +34,7 @@ const DeviceCard = ({ index, deviceSettings, removable, updateDeviceSettings, re
   }
 
   const changeDimension =
-    (property: keyof Pick<DeviceSettings, 'width' | 'height'>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (property: keyof Pick<DeviceSettings, 'width' | 'height'>) => (e: React.FormEvent<HTMLInputElement>) => {
       setDimension((prev) => ({ ...prev, [property]: e.currentTarget.value }))
     }
 
