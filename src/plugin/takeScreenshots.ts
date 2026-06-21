@@ -1,3 +1,4 @@
+import MESSAGE_TYPE from '../constants/messageType'
 import { DeviceSettings, ScreenshotData } from '../types/index'
 import { insertImage } from './insertImage'
 import { requestScreenshotData } from './requestScreenshotData'
@@ -103,4 +104,5 @@ export default async function takeScreenshots({ fetchUrl, url, devices }: takeSc
     ? `${completedTasks}/${totalTasks} screenshots success (${uncompletedTasks} failed)`
     : 'Your screenshots are ready, enjoy!'
   figma.notify(finalMessage)
+  figma.ui.postMessage({ type: MESSAGE_TYPE.SCREENSHOT_COMPLETE })
 }

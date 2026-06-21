@@ -34,7 +34,7 @@ const DeviceCard = ({ index, deviceSettings, removable, updateDeviceSettings, re
   }
 
   const changeDimension =
-    (property: keyof Pick<DeviceSettings, 'width' | 'height'>) => (e: React.FormEvent<HTMLInputElement>) => {
+    (property: keyof Pick<DeviceSettings, 'width' | 'height'>) => (e: React.ChangeEvent<HTMLInputElement>) => {
       setDimension((prev) => ({ ...prev, [property]: e.currentTarget.value }))
     }
 
@@ -56,47 +56,52 @@ const DeviceCard = ({ index, deviceSettings, removable, updateDeviceSettings, re
   }
 
   return (
-    <Card className="group">
-      <CardHeader className="pb-3 flex justify-between items-center">
-        <CardTitle className="">Device {index + 1}</CardTitle>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`w-[28px] h-[28px] opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-all ${removable ? 'visible' : 'invisible'}`}
-          onClick={removeDevice}
-        >
-          <Cross2Icon className="w-[14px] h-[14px]" />
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <Card>
+      {removable && (
+        <CardHeader className="px-3 py-2.5 flex justify-between items-center">
+          <CardTitle className="text-xs font-medium text-muted-foreground">{index + 1}</CardTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Remove device"
+            className="w-[28px] h-[28px] hover:bg-destructive hover:text-destructive-foreground transition-colors"
+            onClick={removeDevice}
+          >
+            <Cross2Icon className="w-[14px] h-[14px]" />
+          </Button>
+        </CardHeader>
+      )}
+      <CardContent className={`px-3 pb-3 space-y-2 ${removable ? '' : 'pt-3'}`}>
         <DeviceSelect value={emulateDevice} onValueChange={updateDevice} />
         {isCustomSize && (
-          <div className="flex gap-x-[8px]">
+          <div className="flex gap-x-2">
             <Input
               type="number"
+              aria-label="Width in pixels"
               placeholder="Width"
               value={dimension.width}
-              onInput={changeDimension('width')}
+              onChange={changeDimension('width')}
               onBlur={getUpdateDimension('width')}
             />
             <Input
               type="number"
+              aria-label="Height in pixels"
               placeholder="Height"
               value={dimension.height}
-              onInput={changeDimension('height')}
+              onChange={changeDimension('height')}
               onBlur={getUpdateDimension('height')}
             />
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="px-3 pb-3">
         <div className="flex items-center space-x-2">
           <Checkbox id={`fullPage${index}`} checked={deviceSettings.fullPage} onClick={updateFullPage} />
           <label
             htmlFor={`fullPage${index}`}
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            Full Page
+            Full page
           </label>
         </div>
       </CardFooter>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { PlusIcon } from '@radix-ui/react-icons'
 
@@ -10,7 +10,7 @@ import { Input } from './components/Input'
 import DeviceCard from './molecules/DeviceCard'
 import { sendMessage } from './services/messageService'
 
-const DEFAULT_DEVICES_VALUE = {
+const DEFAULT_DEVICES_VALUE: DeviceSettings = {
   width: 1920,
   height: 1080,
   emulateDevice: 'custom',
@@ -19,55 +19,66 @@ const DEFAULT_DEVICES_VALUE = {
 
 const MAXIMUM_DEVICES_COUNT = 3
 
+interface DeviceEntry {
+  id: number
+  settings: DeviceSettings
+}
+
+const validateUrl = (value: string): string => {
+  if (!value) return 'Enter a URL'
+  if (!value.startsWith('http://') && !value.startsWith('https://')) {
+    return 'URL must start with https://'
+  }
+  try {
+    new URL(value)
+    return ''
+  } catch {
+    return 'Invalid URL'
+  }
+}
+
 const App = () => {
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
-  const [devices, setDevices] = useState([DEFAULT_DEVICES_VALUE])
+  const [loading, setLoading] = useState(false)
+  const nextId = useRef(0)
+  const touchedRef = useRef(false)
+  const [devices, setDevices] = useState<DeviceEntry[]>(() => [
+    { id: nextId.current++, settings: DEFAULT_DEVICES_VALUE }
+  ])
   const showAddButton = devices.length < MAXIMUM_DEVICES_COUNT
+  const count = devices.length
 
   const onSubmit = () => {
-    sendMessage(MESSAGE_TYPE.TAKE_SCREENSHOT, { url, devices })
+    const urlError = validateUrl(url)
+    if (urlError) {
+      setError(urlError)
+      return
+    }
+    sendMessage(MESSAGE_TYPE.TAKE_SCREENSHOT, { url, devices: devices.map((d) => d.settings) })
+    setLoading(true)
   }
 
   const addNewDevice = () => {
     setDevices((prev) => {
-      if (prev.length >= MAXIMUM_DEVICES_COUNT) {
-        return prev
-      }
-      return [...prev, DEFAULT_DEVICES_VALUE]
+      if (prev.length >= MAXIMUM_DEVICES_COUNT) return prev
+      return [...prev, { id: nextId.current++, settings: DEFAULT_DEVICES_VALUE }]
     })
   }
 
   const updateDeviceSettingsAt = (index: number) => (newDeviceSettings: DeviceSettings) => {
     setDevices((prev) => {
-      const newDevices = [...prev]
-      newDevices[index] = newDeviceSettings
-      return newDevices
+      const next = [...prev]
+      next[index] = { ...next[index], settings: newDeviceSettings }
+      return next
     })
   }
 
   const removeDeviceAt = (index: number) => () => {
     setDevices((prev) => {
-      if (prev.length === 1) {
-        return prev
-      }
-      const newDevices = [...prev]
-      newDevices.splice(index, 1)
-      return newDevices
+      if (prev.length === 1) return prev
+      return prev.filter((_, i) => i !== index)
     })
-  }
-
-  const checkURL = () => {
-    try {
-      if (!url) {
-        setError('Please enter a URL')
-        return
-      }
-      new URL(url)
-    } catch (e) {
-      setError('The URL is invalid')
-      return
-    }
   }
 
   useEffect(() => {
@@ -86,33 +97,53 @@ const App = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      const msg = event.data?.pluginMessage
+      if (msg?.type === MESSAGE_TYPE.SCREENSHOT_COMPLETE) {
+        setLoading(false)
+      }
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
+
   return (
-    <div className="relative m-0 w-full h-full min-h-dvh max-h-dvh overflow-hidden">
-      <div className="space-y-5 px-4 pt-6 pb-16 h-full overflow-auto">
-        <div className="space-y-3">
-          <h2 className="text-xl font-semibold tracking-tight">Website URL</h2>
-          <div className="space-y-1">
-            <Input
-              type="text"
-              value={url}
-              placeholder="URL"
-              onInput={(e) => setUrl(e.currentTarget.value)}
-              onChange={() => setError('')}
-              onBlur={checkURL}
-              error={Boolean(error)}
-            />
-            {error && <p className="pl-2.5 text-xs font-medium text-destructive">{error}</p>}
-          </div>
+    <div className="flex flex-col w-full h-full min-h-dvh max-h-dvh">
+      <div className="flex-1 space-y-5 px-4 pt-6 overflow-auto">
+        <div className="space-y-1.5">
+          <label htmlFor="url-input" className="text-sm font-medium">
+            URL
+          </label>
+          <Input
+            id="url-input"
+            type="text"
+            value={url}
+            placeholder="https://example.com"
+            onChange={(e) => {
+              const val = e.currentTarget.value
+              setUrl(val)
+              touchedRef.current = true
+              if (error) {
+                if (!val || !validateUrl(val)) setError('')
+              }
+            }}
+            onBlur={() => {
+              if (touchedRef.current) setError(validateUrl(url))
+            }}
+            error={Boolean(error)}
+          />
+          {error && <p className="pl-2.5 text-xs font-medium text-destructive">{error}</p>}
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold tracking-tight">Devices</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">Devices</h2>
           {devices.map((device, index) => (
             <DeviceCard
-              key={index}
+              key={device.id}
               index={index}
-              deviceSettings={device}
-              removable={devices.length > 1}
+              deviceSettings={device.settings}
+              removable={count > 1}
               updateDeviceSettings={updateDeviceSettingsAt(index)}
               removeDevice={removeDeviceAt(index)}
             />
@@ -120,14 +151,19 @@ const App = () => {
           {showAddButton && (
             <Button variant="secondary" className="w-full space-x-2" onClick={addNewDevice}>
               <PlusIcon />
-              <span>Add Device</span>
+              <span>Add device</span>
             </Button>
           )}
         </div>
       </div>
-      <Button type="submit" onClick={onSubmit} disabled={Boolean(error)} className="absolute inset-x-4 bottom-4">
-        Take Screenshot{devices.length > 1 ? 's' : ''}
-      </Button>
+
+      <div className="px-4 py-4 shrink-0">
+        <Button type="submit" onClick={onSubmit} disabled={Boolean(error) || loading} className="w-full">
+          {loading
+            ? `Taking screenshot${count > 1 ? 's' : ''}…`
+            : `Take screenshot${count > 1 ? 's' : ''}`}
+        </Button>
+      </div>
     </div>
   )
 }
